@@ -8,14 +8,34 @@ interface Position {
     y: number;
 }
 
+interface Obstacle extends Position {
+    lane: number;
+}
+
+interface RoadMarking {
+    y: number;
+}
+
+const GAME_WIDTH = 300;
+const GAME_HEIGHT = 600;
+const LANE_WIDTH = GAME_WIDTH / 3;
+const PLAYER_WIDTH = 40;
+const PLAYER_HEIGHT = 60;
+const OBSTACLE_WIDTH = 40;
+const OBSTACLE_HEIGHT = 60;
+const MARKING_HEIGHT = 60;
+const MARKING_WIDTH = 10;
+const SPEED = 5;
+
 const Game: React.FC = () => {
-    const [playerPositon, setPlayerPosition] = useState<Position>({ x: 200, y: 500 });
-    const [obstacles, setObstacles] = useState<Position[]>([]);
+    const [playerPosition, setPlayerPosition] = useState<Position>({ x: GAME_WIDTH / 2 - PLAYER_WIDTH / 2, y: GAME_HEIGHT - PLAYER_HEIGHT - 20 });
+    const [obstacles, setObstacles] = useState<Obstacle[]>([]);
+    const [roadMarkings, setRoadMarkings] = useState<Position[]>([]);
     const [gameOver, setGameOver] = useState<boolean>(false);
 
     const movePlayer = useCallback((e: KeyboardEvent) => {
         if (e.key === 'ArrowLeft') {
-            setPlayerPosition(prev => ({...prev, x: Math.max(0, prev.x - 10)}));
+            setPlayerPosition(prev => ({...prev, x: Math.max(0, prev.x - 10)}));        
         } else if (e.key === 'ArrowRight') {
             setPlayerPosition(prev => ({...prev, x: Math.min(380, prev.x + 10)}));
         }
@@ -27,27 +47,44 @@ const Game: React.FC = () => {
     }, [movePlayer]);
 
     useEffect(() => {
+
+        
+
         const gameLoop = setInterval(() => {
             setObstacles(prev => {
                 // Move existing obstacles down
                 const movedObstacles = prev.map(obs => ({ ...obs, y: obs.y + 5 }))
-                    .filter(obs => obs.y < 600);
+                    .filter(obs => obs.y < GAME_HEIGHT);
                 
                 // Randomly generate new obstacle
-                if (Math.random() < 0.1) {  // Increased probability for testing
-                    movedObstacles.push({ x: Math.random() * 350, y: 0 });
+                if (Math.random() < 0.5) {  // Increased probability for testing
+                    const lane = Math.floor(Math.random() * 3);
+                    movedObstacles.push({ x: lane * LANE_WIDTH + (LANE_WIDTH - OBSTACLE_WIDTH) / 2, y: -OBSTACLE_HEIGHT, lane });
                 }
 
                 return movedObstacles;
             });
 
+            setRoadMarkings(prev => {
+                const movedMarkings = prev.map(mark => ({ ...mark, y: mark.y + SPEED }));
+                const visibleMarkings = movedMarkings.filter(mark => mark.y < GAME_HEIGHT);
+                
+                if (Math.random() < 0.1) {
+                    movedMarkings.push({ 
+                        x: LANE_WIDTH * Math.floor(Math.random() * 2) - MARKING_WIDTH / 2, 
+                        y: -MARKING_HEIGHT 
+                    });
+                }
+                return visibleMarkings;
+            });
+
             setPlayerPosition(prev => {
                 // Check for collisions
                 if (obstacles.some(obs => 
-                    obs.x < prev.x + 20 &&
-                    obs.x + 50 > prev.x &&
-                    obs.y < prev.y + 30 &&
-                    obs.y + 30 > prev.y
+                    obs.x < prev.x + PLAYER_WIDTH &&
+                    obs.x + OBSTACLE_WIDTH > prev.x &&
+                    obs.y < prev.y + PLAYER_HEIGHT &&
+                    obs.y + OBSTACLE_HEIGHT > prev.y
                 )) { 
                     setGameOver(true);
                     clearInterval(gameLoop);
@@ -61,11 +98,17 @@ const Game: React.FC = () => {
     }, [obstacles]); 
 
     return (
-        <div className='styles.gameContainer'>
+        <div className={styles.gameContainer} style={{ width: GAME_WIDTH, height: GAME_HEIGHT }}>
             {gameOver && <div className={styles.gameOver}> Game Over! </div>}
-            <div className={styles.player} style={{ left: playerPositon.x, top: playerPositon.y}} />
+            <div className={styles.player} style={{ left: playerPosition.x, top: playerPosition.y, width: PLAYER_WIDTH, height: PLAYER_HEIGHT }} />
             {obstacles.map((obs, index) => (
-                <div key={index} className={styles.obstacle} style={{left: obs.x, top: obs.y}}/>
+                <div key={index} className={styles.obstacle} style={{left: obs.x, top: obs.y, width: OBSTACLE_WIDTH, height: OBSTACLE_HEIGHT}}/>
+            ))}
+            {roadMarkings.map((mark, index) => (
+                <React.Fragment key={index}>
+                    <div className={styles.roadMarking} style={{left: LANE_WIDTH - 5, top: mark.y, height: MARKING_HEIGHT}}/>
+                    <div className={styles.roadMarking} style={{left: LANE_WIDTH * 2 - 5, top: mark.y, height: MARKING_HEIGHT}}/>
+                </React.Fragment>
             ))}
         </div>
     );

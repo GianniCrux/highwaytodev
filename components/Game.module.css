@@ -1,22 +1,23 @@
 .gameContainer {
-  width: 400px;
-  height: 600px;
-  background-color: black;
+  background-color: #333; /* Asphalt color */
   position: relative;
   overflow: hidden;
+  margin: auto;
 }
 
 .player {
-  width: 20px;
-  height: 30px;
   background-color: blue;
   position: absolute;
 }
 
 .obstacle {
-  width: 50px;
-  height: 30px;
   background-color: red;
+  position: absolute;
+}
+
+.roadMarking {
+  width: 10px;
+  background-color: white;
   position: absolute;
 }
 
@@ -27,4 +28,7 @@
   transform: translate(-50%, -50%);
   color: white;
   font-size: 24px;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 20px;
+  border-radius: 10px;
 }
