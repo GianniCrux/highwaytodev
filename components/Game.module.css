@@ -1,0 +1,30 @@
+.gameContainer {
+  width: 400px;
+  height: 600px;
+  background-color: black;
+  position: relative;
+  overflow: hidden;
+}
+
+.player {
+  width: 20px;
+  height: 30px;
+  background-color: blue;
+  position: absolute;
+}
+
+.obstacle {
+  width: 50px;
+  height: 30px;
+  background-color: red;
+  position: absolute;
+}
+
+.gameOver {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 24px;
+}
