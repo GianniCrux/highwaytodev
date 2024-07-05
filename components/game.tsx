@@ -25,13 +25,25 @@ const OBSTACLE_WIDTH = 40;
 const OBSTACLE_HEIGHT = 60;
 const MARKING_HEIGHT = 60;
 const MARKING_WIDTH = 10;
+const MARKING_GAP = 30;
 const SPEED = 5;
 
 const Game: React.FC = () => {
+
+    const initializeRoadMarkings = (): RoadMarking[] => {
+        const markings: RoadMarking[] = [];
+        for (let y = -MARKING_HEIGHT; y < GAME_HEIGHT; y += MARKING_HEIGHT + MARKING_GAP) {
+            markings.push({ y });
+        }
+        return markings;
+    };
+
     const [playerPosition, setPlayerPosition] = useState<Position>({ x: GAME_WIDTH / 2 - PLAYER_WIDTH / 2, y: GAME_HEIGHT - PLAYER_HEIGHT - 20 });
     const [obstacles, setObstacles] = useState<Obstacle[]>([]);
-    const [roadMarkings, setRoadMarkings] = useState<Position[]>([]);
+    const [roadMarkings, setRoadMarkings] = useState<RoadMarking[]>(initializeRoadMarkings());
     const [gameOver, setGameOver] = useState<boolean>(false);
+
+
 
     const movePlayer = useCallback((e: KeyboardEvent) => {
         if (e.key === 'ArrowLeft') {
@@ -47,8 +59,6 @@ const Game: React.FC = () => {
     }, [movePlayer]);
 
     useEffect(() => {
-
-        
 
         const gameLoop = setInterval(() => {
             setObstacles(prev => {
@@ -69,11 +79,8 @@ const Game: React.FC = () => {
                 const movedMarkings = prev.map(mark => ({ ...mark, y: mark.y + SPEED }));
                 const visibleMarkings = movedMarkings.filter(mark => mark.y < GAME_HEIGHT);
                 
-                if (Math.random() < 0.1) {
-                    movedMarkings.push({ 
-                        x: LANE_WIDTH * Math.floor(Math.random() * 2) - MARKING_WIDTH / 2, 
-                        y: -MARKING_HEIGHT 
-                    });
+                while (visibleMarkings[0].y > 0) {
+                    visibleMarkings.unshift({ y: visibleMarkings[0].y - MARKING_HEIGHT - MARKING_GAP });
                 }
                 return visibleMarkings;
             });
@@ -104,12 +111,22 @@ const Game: React.FC = () => {
             {obstacles.map((obs, index) => (
                 <div key={index} className={styles.obstacle} style={{left: obs.x, top: obs.y, width: OBSTACLE_WIDTH, height: OBSTACLE_HEIGHT}}/>
             ))}
-            {roadMarkings.map((mark, index) => (
-                <React.Fragment key={index}>
-                    <div className={styles.roadMarking} style={{left: LANE_WIDTH - 5, top: mark.y, height: MARKING_HEIGHT}}/>
-                    <div className={styles.roadMarking} style={{left: LANE_WIDTH * 2 - 5, top: mark.y, height: MARKING_HEIGHT}}/>
-                </React.Fragment>
-            ))}
+        {roadMarkings.map((mark, index) => (
+            <React.Fragment key={index}>
+                <div className={styles.roadMarking} style={{
+                    left: LANE_WIDTH - MARKING_WIDTH / 2, 
+                    top: mark.y, 
+                    width: MARKING_WIDTH,
+                    height: MARKING_HEIGHT
+                }}/>
+                <div className={styles.roadMarking} style={{
+                    left: LANE_WIDTH * 2 - MARKING_WIDTH / 2, 
+                    top: mark.y, 
+                    width: MARKING_WIDTH,
+                    height: MARKING_HEIGHT
+                }}/>
+            </React.Fragment>
+        ))}
         </div>
     );
 };
