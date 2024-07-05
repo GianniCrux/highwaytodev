@@ -61,7 +61,7 @@ const Game: React.FC = () => {
     }, [obstacles]); 
 
     return (
-        <div>
+        <div className='styles.gameContainer'>
             {gameOver && <div className={styles.gameOver}> Game Over! </div>}
             <div className={styles.player} style={{ left: playerPositon.x, top: playerPositon.y}} />
             {obstacles.map((obs, index) => (
