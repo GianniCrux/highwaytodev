@@ -6,7 +6,8 @@
 }
 
 .player {
-  background-color: blue;
+  background-image: url('/8bitcarbg.svg');
+  background-size: cover;
   position: absolute;
   z-index: 3;
 }
