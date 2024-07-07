@@ -13,7 +13,8 @@
 }
 
 .obstacle {
-  background-color: red;
+  background-image: url('/8bitcarbg.svg'); 
+  background-size: cover;
   position: absolute;
 }
 
