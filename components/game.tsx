@@ -68,9 +68,9 @@ const Game: React.FC = () => {
 
     const handleKeyDown = useCallback((e: KeyboardEvent) => {
         if (e.key === 'ArrowLeft') {
-            setPlayerPosition(prev => ({...prev, x: Math.max(0, prev.x - 15)}));        
+            setPlayerPosition(prev => ({...prev, x: Math.max(0, prev.x - 100)}));        
         } else if (e.key === 'ArrowRight') {
-            setPlayerPosition(prev => ({...prev, x: Math.min(380, prev.x + 15)}));
+            setPlayerPosition(prev => ({...prev, x: Math.min(380, prev.x + 100)}));
         } else if (e.key === 'r') {
             restartGame();
         }
