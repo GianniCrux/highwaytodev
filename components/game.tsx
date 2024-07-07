@@ -32,7 +32,7 @@ const INITIAL_SPAWN_CHANCE = 0.2; // Initial chance of spawning an obstacle
 const MAX_SPAWN_CHANCE = 0.5; // Maximum chance of spawning an obstacle
 const INITIAL_MIN_DISTANCE = 150; // Initial minimum distance between obstacles
 const MIN_DISTANCE = 80; // Minimum distance between obstacles at highest difficulty
-const DIFFICULTY_INCREASE_INTERVAL = 200; // Score at which difficulty increases
+const DIFFICULTY_INCREASE_INTERVAL = 10; // Score at which difficulty increases
 
 const Game: React.FC = () => {
 
@@ -51,6 +51,7 @@ const Game: React.FC = () => {
     const [lastObstacleTime, setLastObstacleTime] = useState<number>(0);
     const [score, setScore] = useState<number>(0);
     const [isPlaying, setIsPlaying] = useState<boolean>(true);
+    const [previousLane, setPreviousLane] = useState<number | null>(null); //Keep track of the last lane used
 
     const restartGame = useCallback(() => {
         setPlayerPosition({ x: GAME_WIDTH / 2 - PLAYER_WIDTH / 2, y: GAME_HEIGHT - PLAYER_HEIGHT - 20 });
@@ -59,18 +60,19 @@ const Game: React.FC = () => {
         setScore(0);
         setLastObstacleTime(0);
         setIsPlaying(true);
+        setPreviousLane(null);
     }, []);
 
     const calculateSpeed = (score: number) => {
         const baseSpeed = 9;
-        return baseSpeed + Math.floor(score / 200);
+        return baseSpeed + Math.floor(score / 100);
     }
 
     const handleKeyDown = useCallback((e: KeyboardEvent) => {
         if (e.key === 'ArrowLeft') {
-            setPlayerPosition(prev => ({...prev, x: Math.max(0, prev.x - 100)}));        
+            setPlayerPosition(prev => ({...prev, x: Math.max(0, prev.x - 15)})); //change those for testing        
         } else if (e.key === 'ArrowRight') {
-            setPlayerPosition(prev => ({...prev, x: Math.min(380, prev.x + 100)}));
+            setPlayerPosition(prev => ({...prev, x: Math.min(380, prev.x + 15)}));
         } else if (e.key === 'r') {
             restartGame();
         }
@@ -93,8 +95,8 @@ const Game: React.FC = () => {
         // Calculate current difficulty based on score
         const difficultyLevel = Math.floor(score / DIFFICULTY_INCREASE_INTERVAL);
         const currentSpawnInterval = Math.max(INITIAL_SPAWN_INTERVAL - difficultyLevel * 50, MIN_SPAWN_INTERVAL);
-        const currentSpawnChance = Math.min(INITIAL_SPAWN_CHANCE + difficultyLevel * 0.05, MAX_SPAWN_CHANCE);
-        const currentMinDistance = Math.max(INITIAL_MIN_DISTANCE - difficultyLevel * 5, MIN_DISTANCE);            
+        const currentSpawnChance = Math.min(INITIAL_SPAWN_CHANCE + difficultyLevel * 0.1, MAX_SPAWN_CHANCE);
+        const currentMinDistance = Math.max(INITIAL_MIN_DISTANCE - difficultyLevel * 10, MIN_DISTANCE);            
 
             setObstacles(prev => {
                 // Move existing obstacles down
@@ -103,7 +105,11 @@ const Game: React.FC = () => {
                 
             // Generate new obstacle with minimum time gap and distance
             if (currentTime - lastObstacleTime > currentSpawnInterval && Math.random() < currentSpawnChance) {
-                const lane = Math.floor(Math.random() * 3);
+                let lane: number;
+                do { //This loop ensures that a new lane is selected if it's the same as the previous one
+                    lane = Math.floor(Math.random() * 3);
+                } while (lane === previousLane); 
+
                 const newObstacleY = -OBSTACLE_HEIGHT;
                 
                 // Check if there's enough distance from the last obstacle
@@ -114,6 +120,7 @@ const Game: React.FC = () => {
                         lane 
                     });
                     setLastObstacleTime(currentTime);
+                    setPreviousLane(lane); //After spawning a new obstacle update the 'previousLane' state with the current lane.
                 }
             }
 
@@ -150,7 +157,7 @@ const Game: React.FC = () => {
         }, 50);
 
         return () => clearInterval(gameLoop);
-    }, [obstacles, lastObstacleTime, isPlaying, score, gameOver]); 
+    }, [obstacles, lastObstacleTime, isPlaying, score, gameOver, previousLane]); 
 
 
     return (
