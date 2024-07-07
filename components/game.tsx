@@ -44,6 +44,7 @@ const Game: React.FC = () => {
     const [gameOver, setGameOver] = useState<boolean>(false);
     const [lastObstacleTime, setLastObstacleTime] = useState<number>(0);
     const [score, setScore] = useState<number>(0);
+    const [isPlaying, setIsPlaying] = useState<boolean>(true);
 
     const restartGame = useCallback(() => {
         setPlayerPosition({ x: GAME_WIDTH / 2 - PLAYER_WIDTH / 2, y: GAME_HEIGHT - PLAYER_HEIGHT - 20 });
@@ -51,6 +52,7 @@ const Game: React.FC = () => {
         setGameOver(false);
         setScore(0);
         setLastObstacleTime(0);
+        setIsPlaying(true);
     }, []);
 
     const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -58,10 +60,10 @@ const Game: React.FC = () => {
             setPlayerPosition(prev => ({...prev, x: Math.max(0, prev.x - 10)}));        
         } else if (e.key === 'ArrowRight') {
             setPlayerPosition(prev => ({...prev, x: Math.min(380, prev.x + 10)}));
-        } else if (e.key === 'r' && gameOver) {
+        } else if (e.key === 'r') {
             restartGame();
         }
-    }, [gameOver, restartGame]);
+    }, [restartGame]);
 
     useEffect(() => {
         window.addEventListener('keydown', handleKeyDown);
@@ -71,6 +73,7 @@ const Game: React.FC = () => {
     useEffect(() => {
 
         const gameLoop = setInterval(() => {
+            if (!isPlaying) return;
             const currentTime = Date.now(); //to check if enough time is passed to generate a new obstacle
 
             setObstacles(prev => {
@@ -117,7 +120,8 @@ const Game: React.FC = () => {
                     obs.y + OBSTACLE_HEIGHT > prev.y
                 )) { 
                     setGameOver(true);
-                    clearInterval(gameLoop);
+                    setIsPlaying(false);
+                    return prev;
                 }
                 return prev;
             });
@@ -126,7 +130,7 @@ const Game: React.FC = () => {
         }, 50);
 
         return () => clearInterval(gameLoop);
-    }, [obstacles, lastObstacleTime]); 
+    }, [obstacles, lastObstacleTime, isPlaying]); 
 
 
     return (
@@ -135,7 +139,7 @@ const Game: React.FC = () => {
                 <div className={styles.gameOver}>
                     GameOver! Score: {score}
                     <br />
-                    Press `&apos`R`&apos`  to restart the game.
+                    Press &apos;R&apos;  to restart the game.
                 </div>
             ) : (
                 <div className={styles.score}> Score: {score}</div>
