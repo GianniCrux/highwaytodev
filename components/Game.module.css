@@ -3,6 +3,43 @@
   position: relative;
   overflow: hidden;
   margin: auto;
+  z-index: 1;
+}
+
+.mainContainer {
+  position: relative;
+}
+
+.treesContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.leftTree {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.rightTree {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.title {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 36px;
+  color: red;
 }
 
 .player {

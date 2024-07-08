@@ -2,6 +2,9 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import styles from './Game.module.css'
+import trees from '@/public/trees.jpg'
+import Image from 'next/image';
+
 
 interface Position {
     x: number;
@@ -161,6 +164,7 @@ const Game: React.FC = () => {
 
 
     return (
+        <div className={styles.mainContainer}>
         <div className={styles.gameContainer} style={{ width: GAME_WIDTH, height: GAME_HEIGHT }}>
             {gameOver ? (
                 <div className={styles.gameOver}>
@@ -192,6 +196,11 @@ const Game: React.FC = () => {
             </React.Fragment>
         ))}
         </div>
+        <div className={styles.treesContainer}>
+            <Image src={trees} className={styles.leftTree} alt='trees'/>
+            <Image src={trees} className={styles.rightTree} alt='trees'/>
+        </div>
+       </div>
     );
 };
 
