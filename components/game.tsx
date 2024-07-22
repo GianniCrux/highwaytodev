@@ -1,9 +1,12 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { ref, push, onValue, query, orderByChild, limitToLast, DataSnapshot } from 'firebase/database';
+
 import styles from './Game.module.css'
 import trees from '@/public/trees.jpg'
 import Image from 'next/image';
+import { database } from '@/firebase';
 
 
 interface Position {
@@ -17,6 +20,10 @@ interface Obstacle extends Position {
 
 interface RoadMarking {
     y: number;
+}
+
+interface Score {
+    score: number;
 }
 
 const GAME_WIDTH = 300;
@@ -57,6 +64,25 @@ const Game: React.FC = () => {
     const [previousLane, setPreviousLane] = useState<number | null>(null); //Keep track of the last lane used
     const [topScores, setTopScores] = useState<number[]>([]);
 
+    useEffect(() => {
+        const scoresRef = query(ref(database, 'scores'), orderByChild('score'), limitToLast(5));
+        onValue(scoresRef, (snapshot: DataSnapshot) => {
+            const scores = snapshot.val() as { [key: string]: Score } | null;
+            if (scores) {
+                const sortedScores = Object.values(scores)
+                    .sort((a, b) => b.score - a.score)
+                    .slice(0, 5)
+                    .map(score => score.score); 
+                setTopScores(sortedScores);
+            }
+        });
+    }, []);
+
+    const updateTopScores = useCallback((newScore: number) => {
+        const scoresRef = ref(database, 'scores');
+        push(scoresRef, { score: newScore });
+    }, []);
+
     const restartGame = useCallback(() => {
         setPlayerPosition({ x: GAME_WIDTH / 2 - PLAYER_WIDTH / 2, y: GAME_HEIGHT - PLAYER_HEIGHT - 20 });
         setObstacles([]);
@@ -94,13 +120,6 @@ const Game: React.FC = () => {
         }
     }, []);
 
-    const updateTopScores = useCallback((newScore: number) => {
-        setTopScores(prevScores => {
-            const updatedScores = [...prevScores, newScore].sort((a, b) => b - a).slice(0, 5);
-            localStorage.setItem('topScores', JSON.stringify(updatedScores));
-            return updatedScores;
-        });
-    }, []);
 
     useEffect(() => {
 
