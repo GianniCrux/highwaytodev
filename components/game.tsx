@@ -55,7 +55,7 @@ const Game: React.FC = () => {
     const [score, setScore] = useState<number>(0);
     const [isPlaying, setIsPlaying] = useState<boolean>(true);
     const [previousLane, setPreviousLane] = useState<number | null>(null); //Keep track of the last lane used
-    const [topScores, setTopScores] = useState<number[]>([500, 400, 300, 200, 100]);
+    const [topScores, setTopScores] = useState<number[]>([]);
 
     const restartGame = useCallback(() => {
         setPlayerPosition({ x: GAME_WIDTH / 2 - PLAYER_WIDTH / 2, y: GAME_HEIGHT - PLAYER_HEIGHT - 20 });
@@ -86,6 +86,21 @@ const Game: React.FC = () => {
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [handleKeyDown]);
+
+    useEffect(() => {
+        const storedScores = localStorage.getItem('topScores');
+        if (storedScores) {
+            setTopScores(JSON.parse(storedScores));
+        }
+    }, []);
+
+    const updateTopScores = useCallback((newScore: number) => {
+        setTopScores(prevScores => {
+            const updatedScores = [...prevScores, newScore].sort((a, b) => b - a).slice(0, 5);
+            localStorage.setItem('topScores', JSON.stringify(updatedScores));
+            return updatedScores;
+        });
+    }, []);
 
     useEffect(() => {
 
@@ -152,6 +167,7 @@ const Game: React.FC = () => {
                 )) { 
                     setGameOver(true);
                     setIsPlaying(false);
+                    updateTopScores(score);
                     return prev;
                 }
                 return prev;
@@ -161,7 +177,7 @@ const Game: React.FC = () => {
         }, 50);
 
         return () => clearInterval(gameLoop);
-    }, [obstacles, lastObstacleTime, isPlaying, score, gameOver, previousLane]); 
+    }, [obstacles, lastObstacleTime, isPlaying, score, gameOver, previousLane, updateTopScores]); 
 
 
     return (
