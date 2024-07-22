@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ref, push, onValue, query, orderByChild, limitToLast, DataSnapshot } from 'firebase/database';
 
 import styles from './Game.module.css'
@@ -63,6 +63,8 @@ const Game: React.FC = () => {
     const [isPlaying, setIsPlaying] = useState<boolean>(true);
     const [previousLane, setPreviousLane] = useState<number | null>(null); //Keep track of the last lane used
     const [topScores, setTopScores] = useState<number[]>([]);
+    const scoreUpdated = useRef<boolean>(false);
+
 
     useEffect(() => {
         const scoresRef = query(ref(database, 'scores'), orderByChild('score'), limitToLast(5));
@@ -91,6 +93,7 @@ const Game: React.FC = () => {
         setLastObstacleTime(0);
         setIsPlaying(true);
         setPreviousLane(null);
+        scoreUpdated.current = false;
     }, []);
 
     const calculateSpeed = (score: number) => {
@@ -113,12 +116,6 @@ const Game: React.FC = () => {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [handleKeyDown]);
 
-    useEffect(() => {
-        const storedScores = localStorage.getItem('topScores');
-        if (storedScores) {
-            setTopScores(JSON.parse(storedScores));
-        }
-    }, []);
 
 
     useEffect(() => {
@@ -176,6 +173,8 @@ const Game: React.FC = () => {
                 return visibleMarkings;
             });
 
+            const newPlayerPosition = playerPosition;
+
             setPlayerPosition(prev => {
                 // Check for collisions
                 if (obstacles.some(obs => 
@@ -183,20 +182,23 @@ const Game: React.FC = () => {
                     obs.x + OBSTACLE_WIDTH > prev.x &&
                     obs.y < prev.y + PLAYER_HEIGHT &&
                     obs.y + OBSTACLE_HEIGHT > prev.y
-                )) { 
-                    setGameOver(true);
-                    setIsPlaying(false);
-                    updateTopScores(score);
+                )) {
+                    if (!scoreUpdated.current) {
+                        setGameOver(true);
+                        setIsPlaying(false);
+                        updateTopScores(score);
+                        scoreUpdated.current = true;                    }
                     return prev;
                 }
-                return prev;
+                return newPlayerPosition;
             });
+
             setScore(prev => prev + 1);
 
         }, 50);
 
         return () => clearInterval(gameLoop);
-    }, [obstacles, lastObstacleTime, isPlaying, score, gameOver, previousLane, updateTopScores]); 
+    }, [obstacles, lastObstacleTime, isPlaying, score, gameOver, previousLane, updateTopScores, scoreUpdated, playerPosition]); 
 
 
     return (
