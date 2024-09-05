@@ -1,5 +1,5 @@
 .gameContainer {
-  background-color: #333; /* Asphalt color */
+  background-color: #0e0e0e;
   position: relative;
   overflow: hidden;
   margin: auto;
@@ -39,35 +39,70 @@
   text-align: center;
   margin-top: 20px auto;
   font-size: 3rem;
-  color: #333;
-  background-color: #0f0;
-  padding: 10px;
+  color: #004d40;
+  background-color: #80cbc4;
+  padding: 5px;
   border-radius: 8px;
 }
 
 .profileContainer {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-}
-
-.top {
-  width: 100%;
-  background-color: rgb(0, 255, 13);
+  margin: 10px auto;
+  width: 90%;
+  max-width: 600px;
 }
 
 .profile {
-  background-color: rgb(0, 255, 13);
-  color: blue;
+  background-color: #80cbc4;
+  color: #004d40;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  width: 100%;
 }
 
 .login {
-  background-color: rgb(0, 255, 13);
-  color: blue;
-  width: 19.5%;
-  border: 1px;
-  border-color: aqua;
+  background-color: #004d40;
+  color: #ffffff;
+  width: 90%;
+  max-width: 200px;
+  padding: 5px 10px;
+  border: 2px solid #004d40;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
   text-align: center;
+}
+
+.login:hover {
+  background-color: #00332b;
+  color: #f1f1f1;
+  border-color: #00332b;
+}
+
+.logout {
+  background-color: #ff5722;
+  color: #ffffff;
+  width: 90%;
+  max-width: 200px;
+  padding: 5px 10px;
+  border: 2px solid #e64a19;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.logout:hover {
+  background-color: #e64a19;
+  color: #ffffff;
+  border-color: #bf360c;
 }
 
 .player {
