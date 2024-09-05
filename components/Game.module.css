@@ -4,6 +4,9 @@
   overflow: hidden;
   margin: auto;
   z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 }
 
 .mainContainer {
@@ -35,24 +38,34 @@
   height: 100%;
 }
 
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  width: 100%;
+}
+
+
 .title {
-  text-align: center;
-  margin-top: 20px auto;
   font-size: 3rem;
   color: #004d40;
   background-color: #80cbc4;
   padding: 5px;
   border-radius: 8px;
+  margin: 0;
+}
+
+.authButtons {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .profileContainer {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin: 10px auto;
-  width: 90%;
-  max-width: 600px;
+  margin: 0;
+  width: auto;
+  max-width: none;
 }
 
 .profile {
@@ -85,6 +98,7 @@
   border-color: #00332b;
 }
 
+
 .logout {
   background-color: #ff5722;
   color: #ffffff;
@@ -98,6 +112,7 @@
   cursor: pointer;
   transition: background-color 0.3s, color 0.3s, border-color 0.3s;
 }
+
 
 .logout:hover {
   background-color: #e64a19;

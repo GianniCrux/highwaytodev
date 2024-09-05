@@ -35,7 +35,7 @@ const AuthButton: React.FC = () => {
   };
 
   return (
-    <div className={styles.profileContainer}>
+        <div className={styles.authButtons}>
       {user ? (
         <div className={styles.profile}>
           <p>Welcome, {user.displayName || "User"}!</p>
@@ -44,7 +44,7 @@ const AuthButton: React.FC = () => {
       ) : (
         <button onClick={handleLogin} className={styles.login}>Login with Google</button>
       )}
-    </div>
+      </div>
   );
 };
 

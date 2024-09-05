@@ -7,8 +7,10 @@ import "./globals.css"
 export default function Home() {
   return (
     <main>
-      <h1 className={styles.top}> <span className={styles.title}>Highway To Dev</span> </h1>
-      <AuthButton />
+      <header className={styles.header}>
+        <h1 className={styles.title}>Highway To Dev</h1>
+        <AuthButton />
+      </header>
       <Game />
     </main>
   );
